@@ -1,27 +1,36 @@
-function DisplayArea({ textElements, searchQuery }) {
+import './DisplayArea.css'
+
+function DisplayArea({ textElements, searchQuery, isActive, onClick, onClose }) {
   return (
     <div
-      style={{
-        border: '1px solid #ccc',
-        minHeight: '200px',
-        padding: '10px',
-        marginBottom: '20px',
-      }}
+      className={`display-area ${isActive ? 'display-area--active' : ''}`}
+      onClick={onClick}
     >
-      {textElements.map((item) => (
-        <span
-          key={item.id}
-          style={{
-            color: item.color,
-            fontSize: item.fontSize,
-            fontFamily: item.fontFamily,
-            backgroundColor:
-              searchQuery && item.char === searchQuery ? 'yellow' : 'transparent',
-          }}
-        >
-          {item.char}
-        </span>
-      ))}
+      <button
+        className="display-area__close"
+        onClick={(e) => {
+          e.stopPropagation()
+          onClose()
+        }}
+      >
+        ×
+      </button>
+
+      <div className="display-area__content">
+        {textElements.map((item) => (
+          <span
+            key={item.id}
+            className={`display-area__char ${searchQuery && item.char === searchQuery ? 'display-area__char--highlight' : ''}`}
+            style={{
+              color: item.color,
+              fontSize: item.fontSize,
+              fontFamily: item.fontFamily,
+            }}
+          >
+            {item.char}
+          </span>
+        ))}
+      </div>
     </div>
   )
 }

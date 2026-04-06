@@ -1,0 +1,210 @@
+/* ============================================================
+   FileMenu.css — Floating Top Navigation Bar
+   ============================================================ */
+
+/* ── Bar ── */
+/* Fixed across the top, floats above the workspace */
+.filemenu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  height: var(--nav-height);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 20px;
+
+  background: rgba(13, 17, 23, 0.82);
+  backdrop-filter: blur(14px) saturate(180%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  border-bottom: 1px solid var(--color-border);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.45);
+}
+
+/* ── Groups (left + right) ── */
+.filemenu__group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.filemenu__group--right {
+  gap: 8px;
+}
+
+/* ── Brand (center) ── */
+.filemenu__brand {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+
+  display: flex;
+  align-items: center;
+  gap: 7px;
+
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  user-select: none;
+  pointer-events: none;
+}
+
+.filemenu__brand-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  box-shadow: 0 0 8px var(--color-accent);
+  animation: pulse-dot 2.8s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1;   box-shadow: 0 0 8px  var(--color-accent); }
+  50%       { opacity: 0.4; box-shadow: 0 0 3px  var(--color-accent); }
+}
+
+/* ── Buttons ── */
+.filemenu__btn {
+  height: 28px;
+  padding: 0 12px;
+
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--color-text-primary);
+
+  background: var(--color-bg-panel-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.filemenu__btn:hover {
+  background: var(--color-bg-panel);
+  border-color: var(--color-border-bright);
+  color: var(--color-text-primary);
+}
+
+.filemenu__btn:active {
+  transform: translateY(1px);
+}
+
+/* Accent variant — "New" button */
+.filemenu__btn--accent {
+  background: var(--color-accent-glow);
+  border-color: var(--color-accent-dim);
+  color: var(--color-accent);
+}
+
+.filemenu__btn--accent:hover {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #0d1117;
+  box-shadow: 0 0 14px var(--color-accent-glow);
+}
+
+/* ── Text input ── */
+.filemenu__input {
+  height: 28px;
+  padding: 0 10px;
+  width: 148px;
+
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--color-text-primary);
+
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  outline: none;
+
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.filemenu__input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.filemenu__input:focus {
+  border-color: var(--color-accent-dim);
+  box-shadow: 0 0 0 2px var(--color-accent-glow);
+}
+
+/* ── Select ── */
+.filemenu__select {
+  height: 28px;
+  padding: 0 28px 0 10px;
+
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--color-text-primary);
+
+  background: var(--color-bg)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238a97b0'/%3E%3C/svg%3E")
+    no-repeat right 9px center;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.filemenu__select:focus {
+  border-color: var(--color-accent-dim);
+  box-shadow: 0 0 0 2px var(--color-accent-glow);
+}
+
+.filemenu__select option {
+  background: var(--color-bg-panel);
+  color: var(--color-text-primary);
+}
+
+/* ── Current file indicator ── */
+.filemenu__current-file {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.2;
+}
+
+.filemenu__current-file-label {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.filemenu__current-file-name {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--color-accent);
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
