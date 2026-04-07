@@ -1,0 +1,102 @@
+/* ============================================================
+   DeletePanel.css — Deletion Controls
+   ============================================================ */
+
+.delete-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  /* Separator from StylePanel above */
+  padding-top: 6px;
+  margin-top: 4px;
+  border-top: 1px solid var(--color-border);
+}
+
+/* ── Button row ───────────────────────────────────────────── */
+.delete-panel__controls {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+/* ── Delete button base ───────────────────────────────────── */
+.delete-panel__btn {
+  flex: 1;
+  height: 28px;
+  border-radius: 5px;
+  padding: 0 6px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--color-text-secondary);
+
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.delete-panel__btn:hover {
+  color: var(--color-text-primary);
+  background: var(--color-surface-3);
+  border-color: var(--color-border-bright);
+}
+
+.delete-panel__btn:active {
+  transform: scale(0.96);
+}
+
+/* ── Icon & text inside button ────────────────────────────── */
+.delete-panel__btn-icon {
+  font-size: 0.72rem;
+  line-height: 1;
+  color: var(--color-text-muted);
+  transition: color var(--transition-fast);
+}
+
+.delete-panel__btn:hover .delete-panel__btn-icon {
+  color: var(--color-text-secondary);
+}
+
+.delete-panel__btn-text {
+  font-size: 0.54rem;
+  letter-spacing: 0.03em;
+}
+
+.delete-panel .panel-label {
+  margin-bottom: 0;
+  font-size: 0.58rem;
+}
+
+/* ── Danger variant (Clear All) ───────────────────────────── */
+.delete-panel__btn--danger {
+  color: var(--color-danger);
+  background: var(--color-danger-dim);
+  border-color: rgba(224, 82, 82, 0.25);
+}
+
+.delete-panel__btn--danger .delete-panel__btn-icon {
+  color: var(--color-danger);
+}
+
+.delete-panel__btn--danger:hover {
+  color: #ff7070;
+  background: rgba(224, 82, 82, 0.2);
+  border-color: var(--color-danger);
+  box-shadow: 0 0 10px rgba(224, 82, 82, 0.2);
+}
+
+.delete-panel__btn--danger:hover .delete-panel__btn-icon {
+  color: #ff7070;
+}

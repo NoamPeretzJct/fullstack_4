@@ -23,13 +23,13 @@ function StylePanel({
           className={`style-panel__mode-btn ${applyMode === 'forward' ? 'style-panel__mode-btn--active' : ''}`}
           onClick={() => onModeChange('forward')} // When clicked, it sets the applyMode to 'forward'.
         >
-          מכאן והלאה
+          Forward
         </button>
         <button
           className={`style-panel__mode-btn ${applyMode === 'all' ? 'style-panel__mode-btn--active' : ''}`}
           onClick={() => onModeChange('all')} // When clicked, it sets the applyMode to 'all'.
         >
-          על כל הטקסט
+          All Text
         </button>
       </div>
 

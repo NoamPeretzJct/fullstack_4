@@ -1,171 +1,157 @@
 /* ============================================================
-   StylePanel.css — Style Controls (dashboard top-row, left slot)
+   StylePanel.css — Text Style Controls
    ============================================================ */
 
-/* ── Panel shell ── */
 .style-panel {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, max-content);
+  column-gap: var(--space-sm);
+  row-gap: 6px;
   align-items: center;
-  gap: 14px;
-  padding: 0 18px;
-  height: 100%;
-  background: var(--color-bg-panel);
 }
 
-/* ── Section label ── */
-.panel-label {
-  font-family: var(--font-mono);
-  font-size: 0.58rem;
-  font-weight: 500;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-  user-select: none;
-  white-space: nowrap;
-  writing-mode: horizontal-tb;
-}
-
-/* ── Vertical divider between controls ── */
-.style-panel__divider {
-  width: 1px;
-  height: 28px;
-  background: var(--color-border);
-  flex-shrink: 0;
-}
-
-/* ── Mode toggle (מכאן / על כל) ── */
+/* ── Mode Toggle (Forward / All Text) ────────────────────── */
 .style-panel__mode-toggle {
+  grid-column: 1 / -1;
   display: flex;
-  align-items: center;
-  gap: 3px;
-  padding: 3px;
-  background: var(--color-bg);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
+  gap: var(--space-xs);
 }
 
 .style-panel__mode-btn {
+  flex: 1;
   height: 24px;
-  padding: 0 10px;
-
+  border-radius: 5px;
   font-family: var(--font-mono);
-  font-size: 0.68rem;
-  color: var(--color-text-secondary);
-  white-space: nowrap;
-  direction: rtl;           /* Hebrew text renders correctly */
-
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: calc(var(--radius-sm) - 2px);
-  cursor: pointer;
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
 
   transition:
-    background     var(--transition-fast),
-    color          var(--transition-fast),
-    border-color   var(--transition-fast);
+    color var(--transition-fast),
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 .style-panel__mode-btn:hover {
-  color: var(--color-text-primary);
-  background: var(--color-bg-panel-alt);
+  color: var(--color-text-secondary);
+  border-color: var(--color-border-bright);
 }
 
 .style-panel__mode-btn--active {
-  background: var(--color-accent-glow);
+  color: var(--color-accent);
+  background: var(--color-accent-subtle);
   border-color: var(--color-accent-dim);
-  color: var(--color-accent);
+  box-shadow: 0 0 8px rgba(245, 166, 35, 0.1);
 }
 
-.style-panel__mode-btn--active:hover {
-  background: var(--color-accent-glow);
-  color: var(--color-accent);
+/* ── Divider ──────────────────────────────────────────────── */
+.style-panel__divider {
+  display: none;
 }
 
-/* ── Generic control row (label + input) ── */
+/* ── Control row ──────────────────────────────────────────── */
 .style-panel__control {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
-  cursor: pointer;
+  align-items: center;
+  gap: 6px;
+  cursor: default;
 }
 
 .style-panel__control-label {
   font-family: var(--font-mono);
-  font-size: 0.55rem;
-  letter-spacing: 0.14em;
+  font-size: 0.58rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--color-text-muted);
-  user-select: none;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
-/* ── Color picker ── */
+/* ── Color control ────────────────────────────────────────── */
+.style-panel__color-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.style-panel__color-input {
+  /* Hide the native color picker chrome, show only the swatch */
+  width: 0;
+  height: 0;
+  padding: 0;
+  border: none;
+  opacity: 0;
+  position: absolute;
+}
+
+.style-panel__color-swatch {
+  display: block;
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  border: 1px solid var(--color-border-bright);
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  /* background is set via inline style — preserved as-is */
+}
+
+/* Make the entire color-wrap clickable to open the color picker */
 .style-panel__color-wrap {
   position: relative;
-  width: 44px;
-  height: 26px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border);
-  overflow: hidden;
   cursor: pointer;
-  transition: border-color var(--transition-fast);
 }
 
-.style-panel__color-wrap:hover {
-  border-color: var(--color-border-bright);
+.style-panel__color-wrap:hover .style-panel__color-swatch {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
-/* Hide the native color input but keep it interactive */
+/* Re-position the actual input so clicking the swatch opens it */
 .style-panel__color-input {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   opacity: 0;
   cursor: pointer;
-  z-index: 1;
-  padding: 0;
-  border: none;
 }
 
-/* Visible swatch driven by inline style from JSX */
-.style-panel__color-swatch {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  transition: background var(--transition-fast);
-}
-
-/* ── Selects ── */
+/* ── Select dropdowns ─────────────────────────────────────── */
 .style-panel__select {
-  height: 26px;
-  padding: 0 24px 0 8px;
-
+  height: 24px;
+  padding: 0 6px;
+  border-radius: 5px;
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: 0.62rem;
   color: var(--color-text-primary);
-
-  background: var(--color-bg)
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238a97b0'/%3E%3C/svg%3E")
-    no-repeat right 7px center;
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
   outline: none;
   cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
+  flex: 1;
+  max-width: 104px;
 
-  transition:
-    border-color var(--transition-fast),
-    box-shadow   var(--transition-fast);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.style-panel__select:hover {
+  border-color: var(--color-border-bright);
 }
 
 .style-panel__select:focus {
   border-color: var(--color-accent-dim);
-  box-shadow: 0 0 0 2px var(--color-accent-glow);
+  box-shadow: 0 0 0 2px var(--color-accent-subtle);
 }
 
-.style-panel__select option {
-  background: var(--color-bg-panel);
-  color: var(--color-text-primary);
+.style-panel .panel-label {
+  grid-column: 1 / -1;
+  margin-bottom: 0;
+  font-size: 0.58rem;
 }

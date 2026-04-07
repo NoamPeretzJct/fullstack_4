@@ -1,181 +1,160 @@
 /* ============================================================
-   App.css — Layout Shell & Global Design Tokens
-   Visual Text Editor
+   App.css — Shell Layout, Workspace & Dashboard
    ============================================================ */
 
-/* ── Google Fonts ── */
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap');
-
-/* ── Design Tokens ── */
-:root {
-  /* Palette */
-  --color-bg:            #0d1117;       /* deep navy-black */
-  --color-bg-mid:        #161b22;       /* workspace layer */
-  --color-bg-panel:      #1c2230;       /* panel surface */
-  --color-bg-panel-alt:  #212736;       /* panel hover / alt */
-  --color-border:        #2a3142;       /* subtle dividers */
-  --color-border-bright: #3d4a63;       /* hover borders */
-
-  /* Accent — amber gold */
-  --color-accent:        #f0a500;
-  --color-accent-dim:    #c47f00;
-  --color-accent-glow:   rgba(240, 165, 0, 0.18);
-
-  /* Text */
-  --color-text-primary:  #e8edf5;
-  --color-text-secondary:#8a97b0;
-  --color-text-muted:    #4a5568;
-
-  /* Document card */
-  --color-doc:           #f7f5f0;       /* warm paper white */
-  --color-doc-shadow:    rgba(0, 0, 0, 0.55);
-
-  /* Typography */
-  --font-display:        'Syne', sans-serif;
-  --font-mono:           'DM Mono', monospace;
-
-  /* Spacing */
-  --nav-height:          52px;
-  --dashboard-gap:       12px;
-  --radius-sm:           6px;
-  --radius-md:           10px;
-  --radius-lg:           16px;
-
-  /* Transitions */
-  --transition-fast:     150ms ease;
-  --transition-base:     240ms ease;
-}
-
-/* ── Reset ── */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html,
-body,
-#root {
-  height: 100%;
-  width: 100%;
-}
-
-body {
-  font-family: var(--font-mono);
-  background-color: var(--color-bg);
-  color: var(--color-text-primary);
-  -webkit-font-smoothing: antialiased;
-  overflow: hidden; /* full-screen app; each zone scrolls internally */
-}
-
-/* ── App Shell ── */
-/* Full-screen column: nav | workspace | dashboard */
+/* ── App Shell ────────────────────────────────────────────── */
 .app-shell {
   display: flex;
   flex-direction: column;
-  height: 100dvh;
-  width: 100%;
-  overflow: hidden;
+  min-height: 100vh;
+  /* Dashboard is fixed, so shell just needs to hold the workspace */
 }
 
-/* ── Workspace (scrollable middle zone) ── */
-.app-workspace {
-  flex: 1 1 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: calc(var(--nav-height) + 24px) 32px 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-
-  /* subtle grid texture */
-  background-color: var(--color-bg-mid);
-  background-image:
-    linear-gradient(var(--color-border) 1px, transparent 1px),
-    linear-gradient(90deg, var(--color-border) 1px, transparent 1px);
-  background-size: 40px 40px;
-  background-position: center center;
-}
-
-/* Custom scrollbar for workspace */
-.app-workspace::-webkit-scrollbar {
-  width: 6px;
-}
-.app-workspace::-webkit-scrollbar-track {
-  background: var(--color-bg);
-}
-.app-workspace::-webkit-scrollbar-thumb {
-  background: var(--color-border-bright);
-  border-radius: 3px;
-}
-.app-workspace::-webkit-scrollbar-thumb:hover {
-  background: var(--color-accent-dim);
-}
-
-/* ── App Title ── */
+/* ── App Title ────────────────────────────────────────────── */
 .app-title {
   font-family: var(--font-display);
   font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 0.25em;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--color-text-muted);
-  user-select: none;
-  padding-left: 2px;
+  text-align: center;
+  margin-bottom: var(--space-xl);
+  /* Subtle amber underline */
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--color-border);
+  width: 100%;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-/* ── Documents Row ── */
-/* Wrapping flex row of document cards */
+/* ── Workspace (scrollable middle zone) ───────────────────── */
+.app-workspace {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--space-xl) var(--space-xl) 0;
+
+  /* Top offset for the fixed FileMenu header */
+  padding-top: calc(56px + var(--space-xl));
+
+  /* Bottom clearance so content doesn't hide under fixed dashboard */
+  padding-bottom: var(--space-xl);
+  /* Dashboard height is dynamic — we give generous clearance.
+     JS could compute this, but per our rules we keep it CSS-only. */
+  margin-bottom: var(--dashboard-clearance, 320px);
+}
+
+/* ── Documents grid inside workspace ─────────────────────── */
 .app-documents {
   display: flex;
   flex-wrap: wrap;
-  gap: 24px;
+  gap: var(--space-xl);
+  justify-content: center;
   align-items: flex-start;
+  width: 100%;
 }
 
-/* ── Control Dashboard (footer) ── */
+/* ── Control Dashboard (fixed to bottom) ─────────────────── */
 .app-control-dashboard {
-  flex-shrink: 0;
-  background-color: var(--color-bg-panel);
-  border-top: 1px solid var(--color-border);
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+
+  /* זה הקסם ששומר על ריווח זהה בשני הצדדים: */
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 20px; /* זה קובע את המרחק האחיד בין כל הקופסאות! */
+
+  padding: 15px 20px 25px 20px;
+  
+  /* הרקע שלך נשאר כמו שהוא */
+  background: linear-gradient(to bottom, transparent 0%, rgba(10, 14, 26, 0.6) 20%, rgba(10, 14, 26, 0.96) 55%);
+}
+
+/* ── Floating Boxes ───────────────────────────────────────── */
+.floating-box {
+  background: var(--box-bg);
+  border: 1px solid var(--box-border);
+  border-radius: var(--box-radius);
+  box-shadow: var(--box-shadow);
+  backdrop-filter: blur(var(--box-blur));
+  -webkit-backdrop-filter: blur(var(--box-blur));
+  padding: var(--space-lg);
+  /* Each box hugs its content height */
+  height: max-content;
+  /* Smooth entrance */
+  animation: boxSlideUp 0.4s var(--transition-slow) both;
+}
+
+.floating-box.box-left  { grid-area: left; }
+.floating-box.box-center { grid-area: center; }
+.floating-box.box-right  { grid-area: right; }
+
+/* Center box is more prominent */
+.floating-box.box-center {
+  border-color: var(--color-accent-dim);
+  box-shadow:
+    var(--box-shadow),
+    0 0 0 1px rgba(245, 166, 35, 0.12),
+    0 0 24px rgba(245, 166, 35, 0.06);
+
+  }
+
+.floating-box.box-left,
+.floating-box.box-right {
+  padding: 14px 18px; /* קצת יותר נושם */
+  flex: 0 0 300px; /* רוחב קבוע לשניהם */
+  height: 170px; /* <--- זה הקסם! נועל את הגובה של שניהם להיות בדיוק אותו דבר. תשחק עם המספר הזה כדי שיתאים בדיוק לתוכן של צד שמאל */
+  
   display: flex;
   flex-direction: column;
-  gap: 0;
-
-  /* top edge glow */
-  box-shadow: 0 -4px 32px rgba(0, 0, 0, 0.4),
-              0 -1px 0   var(--color-border-bright);
+  justify-content: center; /* ממורכז את התוכן פנימה בצורה מושלמת */
+  
+  transform: scale(0.84);
+  transform-origin: bottom center;
 }
 
-/* Top row: StylePanel + DeletePanel + AdvancedPanel side by side */
-.dashboard-row {
-  display: flex;
-  align-items: stretch;
-  gap: 0;
+/* ── Box slide-up animation ──────────────────────────────── */
+@keyframes boxSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.dashboard-row--top {
-  border-bottom: 1px solid var(--color-border);
-  min-height: 72px;
+/* ── Responsive: narrow viewports ────────────────────────── */
+@media (max-width: 900px) {
+  .app-control-dashboard {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "center center"
+      "left   right";
+    align-items: start;
+  }
 }
 
-/* Each panel in the top row separated by vertical dividers */
-.dashboard-row--top > * {
-  flex: 1 1 0;
-  border-right: 1px solid var(--color-border);
-}
+@media (max-width: 600px) {
+  .app-control-dashboard {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "center"
+      "left"
+      "right";
+    max-height: 70vh;
+    overflow-y: auto;
+  }
 
-.dashboard-row--top > *:last-child {
-  border-right: none;
-}
-
-/* Bottom row: KeyboardArea full width */
-.dashboard-row--bottom {
-  min-height: 60px;
-}
-
-.dashboard-row--bottom > * {
-  width: 100%;
+  .app-workspace {
+    margin-bottom: 480px; /* more clearance when stacked */
+  }
 }

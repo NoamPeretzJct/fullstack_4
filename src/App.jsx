@@ -263,7 +263,6 @@ function App() {
       />
 
       <main className="app-workspace">
-        <h1 className="app-title">Visual Text Editor</h1>
         <div className="app-documents">
           {documents.map((doc) => (
             <DisplayArea
@@ -279,28 +278,15 @@ function App() {
       </main>
 
       <footer className="app-control-dashboard">
-        <div className="dashboard-row dashboard-row--top">
-          <StylePanel
-            currentStyle={currentStyle}
-            onStyleChange={handleStyleChange}
-            applyMode={applyMode}
-            onModeChange={setApplyMode}
-          />
-          <DeletePanel
-            onDeleteChar={handleDeleteChar}
-            onDeleteWord={handleDeleteWord}
-            onClearAll={handleClearAll}
-          />
-          <AdvancedPanel
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            onReplace={handleReplace}
-            onUndo={handleUndo}
-            canUndo={activeDoc ? activeDoc.textHistory.length > 0 : false}
-          />
+        <div className="floating-box box-left">
+          <StylePanel currentStyle={currentStyle} onStyleChange={handleStyleChange} applyMode={applyMode} onModeChange={setApplyMode} />
+          <DeletePanel onDeleteChar={handleDeleteChar} onDeleteWord={handleDeleteWord} onClearAll={handleClearAll} />
         </div>
-        <div className="dashboard-row dashboard-row--bottom">
+        <div className="floating-box box-center">
           <KeyboardArea onAddCharacter={handleAddCharacter} />
+        </div>
+        <div className="floating-box box-right">
+          <AdvancedPanel searchQuery={searchQuery} onSearchChange={setSearchQuery} onReplace={handleReplace} onUndo={handleUndo} canUndo={activeDoc ? activeDoc.textHistory.length > 0 : false} />
         </div>
       </footer>
     </div>

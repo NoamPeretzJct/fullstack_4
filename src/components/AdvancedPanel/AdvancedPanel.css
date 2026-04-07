@@ -1,0 +1,186 @@
+/* ============================================================
+   AdvancedPanel.css — Advanced Controls (dashboard top-row, right slot)
+   ============================================================ */
+
+/* ── Panel shell ── */
+.advanced-panel {
+  display: flex;
+  flex-direction: column; 
+  align-items: stretch; 
+  justify-content: center;
+  gap: 8px; /* קצת יותר רווח כדי למלא את הגובה החדש שנתנו */  
+}
+
+/* ── Sub-group (Search / Replace) ── */
+.advanced-panel__group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  
+}
+
+.advanced-panel__group-label {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  user-select: none;
+}
+
+/* ── Replace row ── */
+.advanced-panel__replace-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* מפזר אותם יפה בשטח הקיים */
+  gap: 4px; /* רווח מינימלי בין התיבות לכפתור */
+  flex-wrap: nowrap;
+}
+
+/* Arrow between find → replace */
+.advanced-panel__arrow {
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+  user-select: none;
+  flex-shrink: 0;
+}
+
+/* ── Vertical divider ── */
+.advanced-panel__divider {
+  width: 1px;
+  height: 28px;
+  background: var(--color-border);
+  flex-shrink: 0;
+}
+
+/* ── Text inputs ── */
+.advanced-panel__input {
+  width: 50%;
+  height: 26px;
+  padding: 0;
+  text-align: center;
+  direction: rtl;
+  text-align: center;
+
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--color-text-primary);
+
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  outline: none;
+
+  transition:
+    border-color var(--transition-fast),
+    box-shadow   var(--transition-fast);
+}
+
+.advanced-panel__input::placeholder {
+  font-size: 0.6rem;
+  color: var(--color-text-muted);
+  direction: rtl;
+}
+
+.advanced-panel__input:focus {
+  border-color: var(--color-accent-dim);
+  box-shadow: 0 0 0 2px var(--color-accent-glow);
+}
+
+/* ── Buttons ── */
+.advanced-panel__btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 26px;
+  padding: 0 10px;
+
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--color-text-secondary);
+  direction: rtl;
+  white-space: nowrap;
+
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+
+  transition:
+    background      var(--transition-fast),
+    border-color    var(--transition-fast),
+    color           var(--transition-fast),
+    transform       var(--transition-fast);
+}
+
+.advanced-panel__btn:hover {
+  background: var(--color-bg-panel-alt);
+  border-color: var(--color-border-bright);
+  color: var(--color-text-primary);
+}
+
+.advanced-panel__btn:active {
+  transform: translateY(1px);
+}
+
+/* ── Undo button ── */
+.advanced-panel__btn--undo {
+  direction: ltr;
+  width: 30%;
+  justify-content: center;
+  border-color: rgba(100, 130, 200, 0.35);
+  color: #7a9fd4;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.advanced-panel__btn--undo:hover {
+  background: rgba(100, 130, 200, 0.1);
+  border-color: rgba(100, 130, 200, 0.6);
+  color: #a8c4e8;
+  box-shadow: 0 0 10px rgba(100, 130, 200, 0.12);
+}
+
+.advanced-panel__undo-icon {
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+/* ── Disabled state ── */
+.advanced-panel__btn--disabled,
+.advanced-panel__btn--disabled:hover {
+  opacity: 0.3;
+  cursor: not-allowed;
+  background: transparent;
+  border-color: var(--color-border);
+  color: var(--color-text-muted);
+  box-shadow: none;
+  transform: none;
+}
+
+.advanced-panel__search-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+}
+
+/* 1. קביעת כפתורים בגודל זהה (Undo ו-Replace) */
+.advanced-panel__btn, 
+.advanced-panel__btn--undo {
+  width: 85px !important;
+  justify-content: center;
+}
+
+/* 2. תיבת החיפוש העליונה (ארוכה) */
+.advanced-panel__search-row .advanced-panel__input {
+  width: 150px !important;
+}
+
+/* 3. תיבות ההחלפה התחתונות (קצרות, כי יש שתיים באותה שורה) */
+.advanced-panel__replace-row .advanced-panel__input {
+  width: 65px !important;
+}

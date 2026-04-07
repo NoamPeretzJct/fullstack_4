@@ -1,33 +1,23 @@
-function DeletePanel({ onDeleteChar, onDeleteWord, onClearAll }) {
-  const buttonStyle = {
-    padding: '10px 14px',
-    cursor: 'pointer',
-    background: '#ffd6d6',
-    border: '1px solid #f0aaaa',
-    borderRadius: '6px',
-  }
+import './DeletePanel.css'
 
+function DeletePanel({ onDeleteChar, onDeleteWord, onClearAll }) {
   return (
-    <div
-      style={{
-        display: 'flex',
-        gap: '15px',
-        padding: '10px',
-        background: '#ffe6e6',
-        borderRadius: '8px',
-        marginBottom: '10px',
-        justifyContent: 'center',
-      }}
-    >
-      <button onClick={onDeleteChar} style={buttonStyle}>
-        מחק תו
-      </button>
-      <button onClick={onDeleteWord} style={buttonStyle}>
-        מחק מילה
-      </button>
-      <button onClick={onClearAll} style={buttonStyle}>
-        נקה הכל
-      </button>
+    <div className="delete-panel">
+      <span className="panel-label">Delete</span>
+
+      <div className="delete-panel__controls">
+        <button className="delete-panel__btn" onClick={onDeleteChar}>
+          <span className="delete-panel__btn-icon">⌦</span>
+          <span className="delete-panel__btn-text">Del Char</span>
+        </button>
+        <button className="delete-panel__btn" onClick={onDeleteWord}>
+          <span className="delete-panel__btn-icon">⌦</span>
+          <span className="delete-panel__btn-text">Del Word</span>
+        </button>
+        <button className="delete-panel__btn delete-panel__btn--danger" onClick={onClearAll}>
+          <span className="delete-panel__btn-text">Clear All</span>
+        </button>
+      </div>
     </div>
   )
 }

@@ -1,0 +1,132 @@
+/* ============================================================
+   index.css — Global Design Tokens, Reset & Base Styles
+   Visual Text Editor
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap');
+
+/* ── Design Tokens ────────────────────────────────────────── */
+:root {
+  /* Core palette */
+  --color-bg:            #0a0e1a;
+  --color-surface:       #0f1524;
+  --color-surface-2:     #151c30;
+  --color-surface-3:     #1c2540;
+  --color-border:        #1e2d4d;
+  --color-border-bright: #2a3f6e;
+
+  /* Amber / Gold accent */
+  --color-accent:        #f5a623;
+  --color-accent-dim:    #c07c0a;
+  --color-accent-glow:   rgba(245, 166, 35, 0.35);
+  --color-accent-subtle: rgba(245, 166, 35, 0.08);
+
+  /* Text */
+  --color-text-primary:   #e8eaf2;
+  --color-text-secondary: #7a8aab;
+  --color-text-muted:     #3d4f72;
+  --color-text-accent:    #f5a623;
+
+  /* Semantic */
+  --color-danger:         #e05252;
+  --color-danger-dim:     rgba(224, 82, 82, 0.12);
+  --color-success:        #52c77d;
+
+  /* Blueprint grid */
+  --grid-color:          rgba(42, 63, 110, 0.45);
+  --grid-size:           28px;
+  --grid-dot-size:       1px;
+
+  /* Floating box */
+  --box-bg:              rgba(15, 21, 36, 0.88);
+  --box-border:          rgba(42, 63, 110, 0.7);
+  --box-shadow:          0 8px 32px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3);
+  --box-radius:          14px;
+  --box-blur:            16px;
+
+  /* Typography */
+  --font-display: 'Syne', sans-serif;
+  --font-mono:    'DM Mono', monospace;
+
+  /* Spacing */
+  --space-xs:  4px;
+  --space-sm:  8px;
+  --space-md:  12px;
+  --space-lg:  18px;
+  --space-xl:  24px;
+  --space-2xl: 36px;
+
+  /* Transitions */
+  --transition-fast:   120ms ease;
+  --transition-normal: 220ms ease;
+  --transition-slow:   380ms ease;
+}
+
+/* ── Reset ────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-mono);
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+
+  /* Blueprint dot-grid background */
+  background-image:
+    radial-gradient(circle, var(--grid-color) var(--grid-dot-size), transparent var(--grid-dot-size));
+  background-size: var(--grid-size) var(--grid-size);
+}
+
+button {
+  font-family: var(--font-mono);
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+input,
+select,
+textarea {
+  font-family: var(--font-mono);
+}
+
+/* ── Shared panel-label utility ───────────────────────────── */
+.panel-label {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  margin-bottom: var(--space-md);
+}
+
+/* ── Scrollbar styling ────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-surface);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-bright);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent-dim);
+}

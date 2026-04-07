@@ -2,58 +2,57 @@
    FileMenu.css — Floating Top Navigation Bar
    ============================================================ */
 
-/* ── Bar ── */
-/* Fixed across the top, floats above the workspace */
 .filemenu {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  z-index: 100;
-  height: var(--nav-height);
+  z-index: 200;
+  height: 56px;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 0 20px;
+  gap: var(--space-md);
 
-  background: rgba(13, 17, 23, 0.82);
-  backdrop-filter: blur(14px) saturate(180%);
-  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  padding: 0 var(--space-lg);
+
+  background: rgba(10, 14, 26, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--color-border);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.45);
+
+  /* Subtle amber bottom glow line */
+  box-shadow:
+    0 1px 0 0 rgba(245, 166, 35, 0.15),
+    0 4px 24px rgba(0, 0, 0, 0.4);
 }
 
-/* ── Groups (left + right) ── */
+/* ── Groups (left / right clusters) ──────────────────────── */
 .filemenu__group {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-sm);
+  flex: 1;
 }
 
 .filemenu__group--right {
-  gap: 8px;
+  justify-content: flex-end;
 }
 
-/* ── Brand (center) ── */
+/* ── Brand (center) ───────────────────────────────────────── */
 .filemenu__brand {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-
-  display: flex;
-  align-items: center;
-  gap: 7px;
-
   font-family: var(--font-display);
   font-size: 0.78rem;
   font-weight: 700;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--color-text-secondary);
-  user-select: none;
-  pointer-events: none;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-shrink: 0;
 }
 
 .filemenu__brand-dot {
@@ -62,81 +61,66 @@
   height: 6px;
   border-radius: 50%;
   background: var(--color-accent);
-  box-shadow: 0 0 8px var(--color-accent);
-  animation: pulse-dot 2.8s ease-in-out infinite;
+  box-shadow: 0 0 8px var(--color-accent-glow);
+  animation: pulse 2.5s ease-in-out infinite;
 }
 
-@keyframes pulse-dot {
-  0%, 100% { opacity: 1;   box-shadow: 0 0 8px  var(--color-accent); }
-  50%       { opacity: 0.4; box-shadow: 0 0 3px  var(--color-accent); }
+@keyframes pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--color-accent-glow); }
+  50%       { opacity: 0.5; box-shadow: 0 0 3px var(--color-accent-glow); }
 }
 
-/* ── Buttons ── */
+/* ── Buttons ──────────────────────────────────────────────── */
 .filemenu__btn {
-  height: 28px;
-  padding: 0 12px;
-
+  height: 30px;
+  padding: 0 var(--space-md);
+  border-radius: 6px;
   font-family: var(--font-mono);
   font-size: 0.72rem;
   font-weight: 500;
   letter-spacing: 0.04em;
-  color: var(--color-text-primary);
-
-  background: var(--color-bg-panel-alt);
+  color: var(--color-text-secondary);
+  background: var(--color-surface-2);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  white-space: nowrap;
-
   transition:
+    color var(--transition-fast),
     background var(--transition-fast),
     border-color var(--transition-fast),
-    color var(--transition-fast),
     box-shadow var(--transition-fast);
+  white-space: nowrap;
 }
 
 .filemenu__btn:hover {
-  background: var(--color-bg-panel);
-  border-color: var(--color-border-bright);
   color: var(--color-text-primary);
+  background: var(--color-surface-3);
+  border-color: var(--color-border-bright);
 }
 
-.filemenu__btn:active {
-  transform: translateY(1px);
-}
-
-/* Accent variant — "New" button */
+/* Accent (New) button */
 .filemenu__btn--accent {
-  background: var(--color-accent-glow);
-  border-color: var(--color-accent-dim);
   color: var(--color-accent);
+  border-color: var(--color-accent-dim);
+  background: var(--color-accent-subtle);
 }
 
 .filemenu__btn--accent:hover {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-  color: #0d1117;
-  box-shadow: 0 0 14px var(--color-accent-glow);
+  background: rgba(245, 166, 35, 0.15);
+  box-shadow: 0 0 12px var(--color-accent-glow);
 }
 
-/* ── Text input ── */
+/* ── Text input ───────────────────────────────────────────── */
 .filemenu__input {
-  height: 28px;
-  padding: 0 10px;
-  width: 148px;
-
+  height: 30px;
+  padding: 0 var(--space-sm);
+  border-radius: 6px;
   font-family: var(--font-mono);
   font-size: 0.72rem;
   color: var(--color-text-primary);
-
-  background: var(--color-bg);
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
   outline: none;
-
-  transition:
-    border-color var(--transition-fast),
-    box-shadow var(--transition-fast);
+  width: 130px;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .filemenu__input::placeholder {
@@ -145,66 +129,72 @@
 
 .filemenu__input:focus {
   border-color: var(--color-accent-dim);
-  box-shadow: 0 0 0 2px var(--color-accent-glow);
+  box-shadow: 0 0 0 2px var(--color-accent-subtle);
 }
 
-/* ── Select ── */
+/* ── Select (Open dropdown) ───────────────────────────────── */
 .filemenu__select {
-  height: 28px;
-  padding: 0 28px 0 10px;
-
+  height: 30px;
+  padding: 0 var(--space-sm);
+  border-radius: 6px;
   font-family: var(--font-mono);
   font-size: 0.72rem;
-  color: var(--color-text-primary);
-
-  background: var(--color-bg)
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238a97b0'/%3E%3C/svg%3E")
-    no-repeat right 9px center;
+  color: var(--color-text-secondary);
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
   outline: none;
   cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
-
-  transition:
-    border-color var(--transition-fast),
-    box-shadow var(--transition-fast);
+  transition: border-color var(--transition-fast);
 }
 
 .filemenu__select:focus {
   border-color: var(--color-accent-dim);
-  box-shadow: 0 0 0 2px var(--color-accent-glow);
 }
 
-.filemenu__select option {
-  background: var(--color-bg-panel);
-  color: var(--color-text-primary);
-}
-
-/* ── Current file indicator ── */
+/* ── Active file indicator ────────────────────────────────── */
 .filemenu__current-file {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  line-height: 1.2;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 0 var(--space-sm);
+  height: 30px;
+  border-radius: 6px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
 }
 
 .filemenu__current-file-label {
   font-family: var(--font-mono);
-  font-size: 0.55rem;
-  letter-spacing: 0.14em;
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--color-text-muted);
+  color: var(--color-accent);
 }
 
 .filemenu__current-file-name {
   font-family: var(--font-mono);
   font-size: 0.72rem;
-  font-weight: 500;
-  color: var(--color-accent);
-  max-width: 140px;
+  color: var(--color-text-primary);
+  max-width: 100px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* ── Responsive: collapse gracefully ─────────────────────── */
+@media (max-width: 900px) {
+  .filemenu__input     { width: 90px; }
+  .filemenu__brand     { display: none; }
+  .filemenu__group     { flex: unset; }
+}
+
+@media (max-width: 600px) {
+  .filemenu {
+    height: auto;
+    flex-wrap: wrap;
+    padding: var(--space-sm);
+    gap: var(--space-xs);
+  }
+  .filemenu__current-file { display: none; }
 }
