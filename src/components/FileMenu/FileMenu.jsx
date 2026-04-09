@@ -55,7 +55,7 @@ function FileMenu({
           value={selectedFile}
           onChange={(e) => setSelectedFile(e.target.value)}
         >
-          <option value="">Select a file...</option>
+          <option disabled hidden value="">Select a file...</option>
           {fileList.map((fileName) => (
             <option key={fileName} value={fileName}>
               {fileName}

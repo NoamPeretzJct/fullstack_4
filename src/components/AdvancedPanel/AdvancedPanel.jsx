@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import './AdvancedPanel.css'
 
 function AdvancedPanel({
@@ -10,6 +10,37 @@ function AdvancedPanel({
 }) {
   const [findChar, setFindChar] = useState('')
   const [replaceChar, setReplaceChar] = useState('')
+  // Toast state is used to show a short validation message under the Replace button.
+  const [toastMsg, setToastMsg] = useState('')
+  const toastTimeoutRef = useRef(null)
+
+  useEffect(() => {
+    return () => {
+      if (toastTimeoutRef.current) {
+        clearTimeout(toastTimeoutRef.current)
+      }
+    }
+  }, [])
+
+  function handleReplaceClick() {
+    const replaced = onReplace(findChar, replaceChar)
+
+    if (toastTimeoutRef.current) {
+      clearTimeout(toastTimeoutRef.current)
+    }
+
+    // Show a temporary toast only when the requested character is not present.
+    if (replaced === false) {
+      setToastMsg('Not found')
+      toastTimeoutRef.current = setTimeout(() => {
+        setToastMsg('')
+        toastTimeoutRef.current = null
+      }, 2000)
+      return
+    }
+
+    setToastMsg('')
+  }
 
   return (
     <div className="advanced-panel">
@@ -59,9 +90,10 @@ function AdvancedPanel({
           />
           <button
             className="advanced-panel__btn"
-            onClick={() => onReplace(findChar, replaceChar)}
+            onClick={handleReplaceClick}
           >
             Replace
+            {toastMsg && <span className="advanced-panel__toast">{toastMsg}</span>}
           </button>
         </div>
       </div>

@@ -14,6 +14,7 @@ function createDocument() {
     textElements: [],
     textHistory: [],
     fileName: '',
+    isDirty: false,
   }
 }
 
@@ -84,6 +85,7 @@ function App() {
           ...doc,
           textElements: newElements,
           textHistory: newHistory,
+          isDirty: true,
         }
       }),
     )
@@ -125,9 +127,16 @@ function App() {
   }
 
   function handleReplace(oldChar, newChar) {
+    // Validate that the searched character exists before mutating the active document.
+    const hasMatch = activeDoc?.textElements.some((item) => item.char === oldChar)
+    if (!hasMatch) {
+      return false
+    }
+
     updateActiveDocument((prev) =>
       prev.map((item) => (item.char === oldChar ? { ...item, char: newChar } : item)),
     )
+    return true
   }
 
   function handleUndo() {
@@ -154,86 +163,128 @@ function App() {
   }
 
   function handleSaveAs(fileName) {
-    if (!fileName) {
-      alert('Please enter a file name')
-      return
+
+    const cleanName = (fileName || '').trim();
+
+    // 2. בדיקה אם אחרי הניקוי נשארנו עם כלום
+    if (!cleanName) {
+      alert('Please enter a valid file name');
+      return;
     }
 
-    localStorage.setItem(`editor_file_${fileName}`, JSON.stringify(activeDoc?.textElements || []))
+    // 3. הגנה מדריסה של קובץ אחר:
+    // נזהיר רק אם השם קיים ברשימה, *וגם* זה לא השם של הקובץ הפתוח כרגע.
+    if (cleanName !== activeDoc?.fileName && fileList.includes(cleanName)) {
+      const wantsToOverwrite = window.confirm(`The file "${cleanName}" already exists. Do you want to overwrite it?`);
+      if (!wantsToOverwrite) {
+        return; // המשתמש לחץ "ביטול" - עוצרים את השמירה
+      }
+    }
 
-    if (!fileList.includes(fileName)) {
-      const newList = [...fileList, fileName]
-      setFileList(newList)
-      const globalIndex = JSON.parse(localStorage.getItem('editor_files_index')) || []
-      globalIndex.push({ name: fileName, owner: currentUser })
-      localStorage.setItem('editor_files_index', JSON.stringify(globalIndex))
+    // --- מכאן הכל כמו הקוד שלך, רק משתמשים ב-cleanName במקום fileName ---
+    
+    localStorage.setItem(`editor_file_${cleanName}`, JSON.stringify(activeDoc?.textElements || []));
+
+    if (!fileList.includes(cleanName)) {
+      const newList = [...fileList, cleanName];
+      setFileList(newList);
+      const globalIndex = JSON.parse(localStorage.getItem('editor_files_index')) || [];
+      globalIndex.push({ name: cleanName, owner: currentUser }); // הנחתי ש-currentUser קיים אצלך בסקופ
+      localStorage.setItem('editor_files_index', JSON.stringify(globalIndex));
     }
 
     setDocuments((prevDocs) =>
-      prevDocs.map((doc) => (doc.id === activeDocumentId ? { ...doc, fileName } : doc)),
-    )
-    alert('File saved successfully!')
+      prevDocs.map((doc) => (doc.id === activeDocumentId ? { ...doc, fileName: cleanName, isDirty: false } : doc)),
+    );
+    alert('File saved successfully!');
   }
 
   function handleSave() {
     if (activeDoc?.fileName) {
-      handleSaveAs(activeDoc.fileName)
-      return
+      handleSaveAs(activeDoc.fileName); // שולח את השם הקיים - זה יעבור את בדיקת הדריסה בשקט בזכות הטריק שלנו
+      return;
     }
-    alert("Please use 'Save As' to name your file first.")
+    alert("Please use 'Save As' to name your file first.");
   }
 
   function handleOpen(fileName) {
-    if (!fileName) return
-    const data = localStorage.getItem(`editor_file_${fileName}`)
-    if (!data) return
+    if (!fileName) return;
 
-    setDocuments((prevDocs) =>
-      prevDocs.map((doc) =>
-        doc.id === activeDocumentId
-          ? {
-              ...doc,
-              textElements: JSON.parse(data),
-              textHistory: [],
-              fileName,
-            }
-          : doc,
-      ),
-    )
+    // בונוס UX: אם הקובץ כבר פתוח באחד הטאבים, פשוט נעבור אליו בלי לשכפל!
+    const alreadyOpenDoc = documents.find(doc => doc.fileName === fileName);
+    if (alreadyOpenDoc) {
+      setActiveDocumentId(alreadyOpenDoc.id);
+      return;
+    }
+
+    const data = localStorage.getItem(`editor_file_${fileName}`);
+    if (!data) return;
+
+    const parsedData = JSON.parse(data);
+
+    // בדיקה: האם המסמך הפעיל כרגע ריק לגמרי וחסר שם?
+    const isEmptyAndUnnamed = !activeDoc.fileName && activeDoc.textElements.length === 0;
+
+    if (isEmptyAndUnnamed) {
+      // המסמך ריק ואין לו שם - נדרוס אותו ונציג בו את הקובץ שנפתח
+      setDocuments((prevDocs) =>
+        prevDocs.map((doc) =>
+          doc.id === activeDocumentId
+            ? { ...doc, textElements: parsedData, textHistory: [], fileName, isDirty: false }
+            : doc
+        )
+      );
+    } else {
+      // יש לנו עבודה על המסך (או שיש לה שם, או שיש בה טקסט).
+      // במקום לדרוס, נוסיף מסמך חדש ונפתח אותו לצידו!
+      const newDoc = {
+        id: crypto.randomUUID(),
+        textElements: parsedData,
+        textHistory: [],
+        fileName,
+        isDirty: false,
+      };
+      
+      setDocuments((prevDocs) => [...prevDocs, newDoc]);
+      setActiveDocumentId(newDoc.id); // מעביר את הפוקוס לקובץ החדש שפתחנו
+    }
   }
 
   function handleCloseDocument(id) {
     const docToClose = documents.find((doc) => doc.id === id)
     if (!docToClose) return;
 
-    const wantsToSave = window.confirm('Do you want to save this document before closing?')
+    // התיקון: מקפיצים את שאלת השמירה *רק* אם הקובץ שונה
+    if (docToClose.isDirty) {
+      const wantsToSave = window.confirm('Do you want to save this document before closing?')
 
-    if (wantsToSave) {
-      let fName = docToClose.fileName
+      if (wantsToSave) {
+        let fName = docToClose.fileName
 
-      if (!fName) {
-        fName = window.prompt('Enter file name to save:')
-      }
+        if (!fName) {
+          fName = window.prompt('Enter file name to save:')
+        }
 
-      // תיקון באג 2: סוגרים רק אם באמת נתנו שם וזה נשמר
-      if (fName) {
-        localStorage.setItem(`editor_file_${fName}`, JSON.stringify(docToClose.textElements))
-        if (!fileList.includes(fName)) {
-          const newList = [...fileList, fName]
-          setFileList(newList)
-          const globalIndex = JSON.parse(localStorage.getItem('editor_files_index')) || []
-          globalIndex.push({ name: fName, owner: currentUser })
-          localStorage.setItem('editor_files_index', JSON.stringify(globalIndex))
+        // תיקון באג 2: סוגרים רק אם באמת נתנו שם וזה נשמר
+        if (fName) {
+          localStorage.setItem(`editor_file_${fName}`, JSON.stringify(docToClose.textElements))
+          if (!fileList.includes(fName)) {
+            const newList = [...fileList, fName]
+            setFileList(newList)
+            const globalIndex = JSON.parse(localStorage.getItem('editor_files_index')) || []
+            globalIndex.push({ name: fName, owner: currentUser })
+            localStorage.setItem('editor_files_index', JSON.stringify(globalIndex))
+          }
+        } else {
+          return; // אם המשתמש ביטל את בקשת השם, נעצור ולא נסגור
         }
       } else {
-        return; // אם המשתמש ביטל את בקשת השם, נעצור ולא נסגור
+        const confirmClose = window.confirm('Are you sure you want to close without saving? Unsaved changes will be lost.')
+        if (!confirmClose) return;
       }
-    } else {
-      const confirmClose = window.confirm('Are you sure you want to close without saving? Unsaved changes will be lost.')
-      if (!confirmClose) return;
     }
 
-    // תהליך סגירת הקובץ
+    // --- תהליך סגירת הקובץ המקורי שלך (ללא האנימציות) ---
     let remainingDocs = documents.filter((doc) => doc.id !== id)
 
     // אם סגרנו את הקובץ האחרון, פותחים מסמך חדש כדי לא להשאיר מסך ריק
@@ -247,7 +298,6 @@ function App() {
       setActiveDocumentId(remainingDocs[0].id)
     }
   }
-
   // חומת ההגנה של מסך ההתחברות (רינדור מותנה)
   if (!currentUser) {
     return <Auth onLogin={handleLogin} />
