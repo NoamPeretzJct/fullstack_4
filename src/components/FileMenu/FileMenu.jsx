@@ -4,6 +4,8 @@ import './FileMenu.css'
 function FileMenu({
   fileList,
   currentFileName,
+  currentUser, // <-- חדש
+  onLogout,    // <-- חדש
   onSave,
   onSaveAs,
   onOpen,
@@ -34,12 +36,20 @@ function FileMenu({
         <button className="filemenu__btn" onClick={onSave}>Save</button>
       </div>
 
-      <div className="filemenu__brand">
+     <div className="filemenu__brand">
         <span className="filemenu__brand-dot" />
         Visual Text Editor
+        {currentUser && (
+          <span style={{ fontSize: '0.6rem', marginLeft: '15px', color: 'var(--color-accent)' }}>
+            | User: {currentUser}
+          </span>
+        )}
       </div>
 
       <div className="filemenu__group filemenu__group--right">
+        <button className="filemenu__btn" onClick={onLogout} style={{ borderColor: 'var(--color-danger)', color: 'var(--color-danger)' }}>
+          Logout
+        </button>
         <select
           className="filemenu__select"
           value={selectedFile}
