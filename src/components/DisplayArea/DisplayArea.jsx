@@ -16,7 +16,7 @@ function DisplayArea({ textElements, searchQuery, isActive, onClick, onClose }) 
         ×
       </button>
 
-      <div className="display-area__content">
+      <div className="display-area__content" dir="auto">
         {textElements.map((item) => (
           <span
             key={item.id}

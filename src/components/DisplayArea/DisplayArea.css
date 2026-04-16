@@ -1,6 +1,4 @@
-/* ============================================================
-   DisplayArea.css — Document Canvas Card
-   ============================================================ */
+
 
 .display-area {
   position: relative;
@@ -23,14 +21,14 @@
     transform var(--transition-normal);
 }
 
-/* Subtle hover lift on inactive cards */
+
 .display-area:not(.display-area--active):hover {
   border-color: #bcc8d6;
   transform: translateY(-2px);
   box-shadow: 0 14px 32px rgba(10, 14, 26, 0.22);
 }
 
-/* ── Active card: amber glow border ──────────────────────── */
+
 .display-area--active {
   border-color: var(--color-accent-dim);
   box-shadow:
@@ -40,7 +38,7 @@
   cursor: default;
 }
 
-/* Active card top accent bar */
+
 .display-area--active::before {
   content: '';
   position: absolute;
@@ -114,6 +112,8 @@
 
   /* Subtle inner shadow to indicate depth */
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45);
+
+  text-align: start;
 }
 
 /* ── Individual character spans ───────────────────────────── */

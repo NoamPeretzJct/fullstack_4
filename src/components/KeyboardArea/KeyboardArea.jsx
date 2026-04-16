@@ -1,69 +1,73 @@
 import { useState } from 'react'
 import './KeyboardArea.css'
 
+
 const keyboardLayouts = {
-  hebrew:'םןףץתשרקצפעסנמלכיטחזוהדגבא'.split(''),
-  english: 'abcdefghijklmnopqrstuvwxyz'.split(''),
-  symbols: '0123456789!@#%&()+-=[]:,.?'.split(''),
-  emojis: ['😀', '😂', '😍', '😎', '🤔', '👍', '❤️', '🔥', '✨', '🎉', '✅',
-         '🥳', '😇', '🤩', '😜', '😡', '😭', '🤯', '😴', '👀', '💪', '🚀'],
+  hebrew: [
+    ['/', "'", 'ק', 'ר', 'א', 'ט', 'ו', 'ן', 'ם', 'פ'],
+    ['ש', 'ד', 'ג', 'כ', 'ע', 'י', 'ח', 'ל', 'ך', 'ף'],
+    ['ז', 'ס', 'ב', 'ה', 'נ', 'מ', 'צ', 'ת', 'ץ'],
+    [{ char: ' ', label: 'רווח', type: 'space' }] 
+  ],
+  english: [
+    ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
+    ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
+    ['z', 'x', 'c', 'v', 'b', 'n', 'm'],
+    [{ char: ' ', label: 'Space', type: 'space' }]
+  ],
+  symbols: [
+    ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
+    ['!', '@', '#', '$', '%', '^', '&', '*', '(', ')'],
+    ['-', '_', '=', '+', '[', ']', '{', '}', ';', ':'],
+    [',', '.', '<', '>', '?', { char: ' ', label: 'Space', type: 'space' }]
+  ],
+  emojis: [
+    ['😀', '😂', '😍', '😎', '🤔', '👍', '❤️', '🔥'],
+    ['✨', '🎉', '✅', '🥳', '😇', '🤩', '😜', '😡'],
+    ['😭', '🤯', '😴', '👀', '💪', '🚀', '⭐', '🎈'],
+  ]
 }
 
-function KeyboardArea({ onAddCharacter }) {
-  const [layout, setLayout] = useState('hebrew') // State to track the current keyboard layout, defaulting to Hebrew
-  const activeKeys = keyboardLayouts[layout] ?? keyboardLayouts.hebrew // Fallback to Hebrew if layout is not found
+export default function KeyboardArea({ onAddCharacter }) {
+  const [language, setLanguage] = useState('hebrew')
+
+  const currentLayout = keyboardLayouts[language]
 
   return (
-    <div className="keyboard-area">
-      <div className="keyboard-area__layout-switcher">
-        {/*here we have buttons to switch between different keyboard layouts (Hebrew, English, Symbols, Emojis). When a button is clicked, it updates the layout state, which in turn updates the activeKeys that are displayed on the keyboard.*/}
-        <button
-          className={`keyboard-area__layout-btn ${layout === 'hebrew' ? 'keyboard-area__layout-btn--active' : ''}`}
-          onClick={() => setLayout('hebrew')}
-        >
-          עברית
-        </button>
-        <button
-          className={`keyboard-area__layout-btn ${layout === 'english' ? 'keyboard-area__layout-btn--active' : ''}`}
-          onClick={() => setLayout('english')}
-        >
-          English
-        </button>
-        <button
-          className={`keyboard-area__layout-btn ${layout === 'symbols' ? 'keyboard-area__layout-btn--active' : ''}`}
-          onClick={() => setLayout('symbols')}
-        >
-          123!@
-        </button>
-        <button
-          className={`keyboard-area__layout-btn ${layout === 'emojis' ? 'keyboard-area__layout-btn--active' : ''}`}
-          onClick={() => setLayout('emojis')}
-        >
-          ✦ Emoji
-        </button>
+    <div className="keyboard-modern-container">
+      <div className="keyboard-tabs">
+        <button className={language === 'hebrew' ? 'active' : ''} onClick={() => setLanguage('hebrew')}>עברית</button>
+        <button className={language === 'english' ? 'active' : ''} onClick={() => setLanguage('english')}>English</button>
+        <button className={language === 'symbols' ? 'active' : ''} onClick={() => setLanguage('symbols')}>123!?</button>
+        <button className={language === 'emojis' ? 'active' : ''} onClick={() => setLanguage('emojis')}>😊</button>
       </div>
 
-      <div className="keyboard-area__keys">
-        {activeKeys.map((letter) => (
-          <button
-            key={letter}
-            className={`keyboard-area__key ${layout === 'emojis' ? 'keyboard-area__key--emoji' : ''}`}
-            onClick={() => onAddCharacter(letter)}
-          >
-            {letter}
-          </button>
+      <div className="keyboard-board">
+        {/* עוברים בלולאה על השורות */}
+        {currentLayout.map((row, rowIndex) => (
+          <div key={rowIndex} className={`keyboard-row row-${rowIndex}`}>
+            
+            {/* בתוך כל שורה, עוברים על המקשים */}
+            {row.map((keyItem, keyIndex) => {
+              // בודקים אם המקש הוא אובייקט (כמו הרווח) או סתם אות (מחרוזת)
+              const isObj = typeof keyItem === 'object'
+              const char = isObj ? keyItem.char : keyItem
+              const label = isObj ? keyItem.label : keyItem
+              const keyType = isObj ? keyItem.type : 'standard'
+
+              return (
+                <button
+                  key={keyIndex}
+                  className={`key-btn key-${keyType}`}
+                  onClick={() => onAddCharacter(char)}
+                >
+                  {label}
+                </button>
+              )
+            })}
+          </div>
         ))}
       </div>
-
-      <button
-        className="keyboard-area__space"
-        onClick={() => onAddCharacter(' ')}
-      >
-        <span className="keyboard-area__space-icon">⎵</span>
-        Space
-      </button>
     </div>
   )
 }
-
-export default KeyboardArea
