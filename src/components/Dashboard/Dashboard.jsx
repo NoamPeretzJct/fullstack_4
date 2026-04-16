@@ -38,6 +38,7 @@ function Dashboard({
     onAddCharacter(char, currentStyle)
   }
 
+  
   return (
     <footer className="dashboard">
       <div className="dashboard__box dashboard__box--left">

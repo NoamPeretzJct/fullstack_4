@@ -4,8 +4,8 @@ import './FileMenu.css'
 function FileMenu({
   fileList,
   currentFileName,
-  currentUser, // <-- חדש
-  onLogout,    // <-- חדש
+  currentUser,
+  onLogout,    
   onSave,
   onSaveAs,
   onOpen,

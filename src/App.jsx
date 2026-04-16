@@ -68,7 +68,7 @@ function App() {
     setActiveDocumentId(nextWorkspaceState.activeDocumentId)
   }
 
-  
+
   function handleAuthenticated(username) {
     setCurrentUser(username)
     setFileList(getUserFileNames(username))
@@ -93,6 +93,7 @@ function App() {
     )
   }
 
+  // Character Input from KeyboardArea
   function handleAddCharacter(char, currentStyle) {
     setDocuments((prevDocs) =>
       updateActiveDocument(
