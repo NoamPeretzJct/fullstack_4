@@ -1,0 +1,23 @@
+.workspace {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--space-xl);
+  padding-top: calc(56px + var(--space-xl));
+  padding-bottom: var(--workspace-bottom-clearance, 320px);
+}
+
+.workspace__documents {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xl);
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+}
+
+@media (max-width: 600px) {
+  .workspace {
+    padding-bottom: 480px;
+  }
+}

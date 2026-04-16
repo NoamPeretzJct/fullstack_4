@@ -1,260 +1,235 @@
-import { useEffect, useState } from 'react'
-import AdvancedPanel from './components/AdvancedPanel/AdvancedPanel'
-import DeletePanel from './components/DeletePanel/DeletePanel'
-import DisplayArea from './components/DisplayArea/DisplayArea'
-import FileMenu from './components/FileMenu/FileMenu'
-import KeyboardArea from './components/KeyboardArea/KeyboardArea'
-import StylePanel from './components/StylePanel/StylePanel'
+import { useState } from 'react'
 import Auth from './components/Auth/Auth'
+import Dashboard from './components/Dashboard/Dashboard'
+import TopBar from './components/TopBar/TopBar'
+import Workspace from './components/Workspace/Workspace'
+import {
+  clearCurrentSession,
+  getCurrentSessionUser,
+} from './utils/auth/sessionStorage'
+import {
+  markDocumentSaved,
+  undoActiveDocument,
+  updateActiveDocument,
+} from './utils/editor/documentLifecycle'
+import {
+  addCharacter,
+  applyStyleToText,
+  clearText,
+  deleteLastCharacter,
+  deleteLastWord,
+  replaceCharacters,
+} from './utils/editor/textTransforms'
+import {
+  appendNewDocument,
+  createInitialWorkspaceState,
+  findDocumentByFileName,
+  findDocumentById,
+  getActiveDocument,
+  loadDocumentIntoWorkspace,
+  removeDocumentFromWorkspace,
+} from './utils/editor/workspaceUtils'
+import {
+  appendFileIndexEntry,
+  fileExists,
+  getUserFileNames,
+  hasIndexedFile,
+} from './utils/files/fileIndexUtils'
+import {
+  isValidFileName,
+  normalizeFileName,
+  shouldConfirmOverwrite,
+} from './utils/files/fileNameUtils'
+import {
+  getStoredFileIndex,
+  openDocumentFromStorage,
+  saveFileIndex,
+  writeDocumentToStorage,
+} from './utils/files/fileStorage'
 import './App.css'
 
-function createDocument() {
-  return {
-    id: crypto.randomUUID(),
-    textElements: [],
-    textHistory: [],
-    fileName: '',
-    isDirty: false,
-  }
-}
-
-const initialDocument = createDocument()
+const initialCurrentUser = getCurrentSessionUser()
+const initialWorkspaceState = createInitialWorkspaceState()
 
 function App() {
-  const [currentStyle, setCurrentStyle] = useState({
-    color: '#000000',
-    fontSize: '16px',
-    fontFamily: 'Arial',
-  })
-  const [applyMode, setApplyMode] = useState('forward')
-  const [documents, setDocuments] = useState([initialDocument])
-  const [activeDocumentId, setActiveDocumentId] = useState(initialDocument.id)
+  const [currentUser, setCurrentUser] = useState(initialCurrentUser)
+  const [documents, setDocuments] = useState(initialWorkspaceState.documents)
+  const [activeDocumentId, setActiveDocumentId] = useState(initialWorkspaceState.activeDocumentId)
   const [searchQuery, setSearchQuery] = useState('')
-  const [fileList, setFileList] = useState([])
+  const [fileList, setFileList] = useState(() => getUserFileNames(initialCurrentUser))
 
-  // --- ניהול משתמשים מתקדם ---
-  const [currentUser, setCurrentUser] = useState(localStorage.getItem('editor_current_user') || '')
+  const activeDoc = getActiveDocument(documents, activeDocumentId)
 
-  useEffect(() => {
-    if (currentUser) {
-      const globalIndex = JSON.parse(localStorage.getItem('editor_files_index')) || []
-      const userFiles = globalIndex
-        .filter((file) => file.owner === currentUser)
-        .map((file) => file.name)
+  // Session and App Initialization
+  
+  function resetEditorState() {
+    const nextWorkspaceState = createInitialWorkspaceState()
+    setDocuments(nextWorkspaceState.documents)
+    setActiveDocumentId(nextWorkspaceState.activeDocumentId)
+  }
 
-      setFileList(userFiles)
-    }
-  }, [currentUser])
-
-  function handleLogin(username) {
-    localStorage.setItem('editor_current_user', username)
+  function handleAuthenticated(username) {
     setCurrentUser(username)
-    
-    // תיקון באג 1: איפוס הלוח והמסמכים כשנכנס משתמש חדש
-    const newDoc = createDocument()
-    setDocuments([newDoc])
-    setActiveDocumentId(newDoc.id)
+    setFileList(getUserFileNames(username))
+    resetEditorState()
   }
 
   function handleLogout() {
-    localStorage.removeItem('editor_current_user')
+    clearCurrentSession()
     setCurrentUser('')
-    
-    // תיקון באג 1: איפוס הלוח כשיוצאים כדי למנוע זליגת מידע
-    const newDoc = createDocument()
-    setDocuments([newDoc])
-    setActiveDocumentId(newDoc.id)
+    setFileList([])
+    resetEditorState()
   }
-  // --- סוף ניהול משתמשים ---
 
-  const activeDoc = documents.find((doc) => doc.id === activeDocumentId) || documents[0]
-
-  function updateActiveDocument(updaterFn, saveHistory = true) {
+  // Text Editing and Document Mutations
+  function handleApplyStyleToAll(key, value) {
     setDocuments((prevDocs) =>
-      prevDocs.map((doc) => {
-        if (doc.id !== activeDocumentId) {
-          return doc
-        }
-
-        const newElements = updaterFn(doc.textElements)
-        const newHistory = saveHistory
-          ? [...doc.textHistory, doc.textElements]
-          : doc.textHistory
-
-        return {
-          ...doc,
-          textElements: newElements,
-          textHistory: newHistory,
-          isDirty: true,
-        }
-      }),
+      updateActiveDocument(
+        prevDocs,
+        activeDocumentId,
+        (textElements) => applyStyleToText(textElements, key, value),
+      ),
     )
   }
 
-  function handleStyleChange(key, value) {
-    setCurrentStyle((prev) => ({ ...prev, [key]: value }))
-    if (applyMode === 'all') {
-      updateActiveDocument((prev) => prev.map((item) => ({ ...item, [key]: value })))
-    }
-  }
-
-  function handleAddCharacter(char) {
-    updateActiveDocument((prev) => [
-      ...prev,
-      { id: crypto.randomUUID(), char, ...currentStyle },
-    ])
+  function handleAddCharacter(char, currentStyle) {
+    setDocuments((prevDocs) =>
+      updateActiveDocument(
+        prevDocs,
+        activeDocumentId,
+        (textElements) => addCharacter(textElements, char, currentStyle),
+      ),
+    )
   }
 
   function handleDeleteChar() {
-    updateActiveDocument((prev) => prev.slice(0, -1))
+    setDocuments((prevDocs) =>
+      updateActiveDocument(prevDocs, activeDocumentId, deleteLastCharacter),
+    )
   }
 
   function handleDeleteWord() {
-    updateActiveDocument((prev) => {
-      const next = [...prev]
-      while (next.length > 0 && next[next.length - 1].char === ' ') {
-        next.pop()
-      }
-      while (next.length > 0 && next[next.length - 1].char !== ' ') {
-        next.pop()
-      }
-      return next
-    })
+    setDocuments((prevDocs) =>
+      updateActiveDocument(prevDocs, activeDocumentId, deleteLastWord),
+    )
   }
 
   function handleClearAll() {
-    updateActiveDocument(() => [])
+    setDocuments((prevDocs) =>
+      updateActiveDocument(prevDocs, activeDocumentId, clearText),
+    )
   }
 
   function handleReplace(oldChar, newChar) {
-    // Validate that the searched character exists before mutating the active document.
-    const hasMatch = activeDoc?.textElements.some((item) => item.char === oldChar)
-    if (!hasMatch) {
+    const result = replaceCharacters(activeDoc?.textElements || [], oldChar, newChar)
+    if (!result.success) {
       return false
     }
 
-    updateActiveDocument((prev) =>
-      prev.map((item) => (item.char === oldChar ? { ...item, char: newChar } : item)),
+    setDocuments((prevDocs) =>
+      updateActiveDocument(prevDocs, activeDocumentId, () => result.textElements),
     )
     return true
   }
 
   function handleUndo() {
-    setDocuments((prevDocs) =>
-      prevDocs.map((doc) => {
-        if (doc.id !== activeDocumentId || doc.textHistory.length === 0) {
-          return doc
-        }
-        const previousText = doc.textHistory[doc.textHistory.length - 1]
-        const newHistory = doc.textHistory.slice(0, -1)
-        return {
-          ...doc,
-          textElements: previousText,
-          textHistory: newHistory,
-        }
-      }),
-    )
+    setDocuments((prevDocs) => undoActiveDocument(prevDocs, activeDocumentId))
   }
 
+  // Workspace and Document Tabs
   function handleNewDocument() {
-    const newDoc = createDocument()
-    setDocuments((prev) => [...prev, newDoc])
-    setActiveDocumentId(newDoc.id)
+    const nextWorkspaceState = appendNewDocument(documents)
+    setDocuments(nextWorkspaceState.documents)
+    setActiveDocumentId(nextWorkspaceState.activeDocumentId)
+  }
+
+  // File Persistence
+  function persistDocumentForUser(documentToSave, fileName) {
+    if (!currentUser) {
+      return { success: false, error: 'No active user' }
+    }
+
+    const cleanName = normalizeFileName(fileName || documentToSave?.fileName)
+    if (!isValidFileName(cleanName)) {
+      return { success: false, error: 'Please enter a valid file name' }
+    }
+
+    writeDocumentToStorage(cleanName, documentToSave)
+
+    const fileIndex = getStoredFileIndex()
+    const alreadyIndexed = hasIndexedFile(fileIndex, currentUser, cleanName)
+    if (!alreadyIndexed) {
+      const nextFileIndex = appendFileIndexEntry(fileIndex, currentUser, cleanName)
+      saveFileIndex(nextFileIndex)
+    }
+
+    return { success: true, fileName: cleanName }
   }
 
   function handleSaveAs(fileName) {
-
-    const cleanName = (fileName || '').trim();
-
-    // 2. בדיקה אם אחרי הניקוי נשארנו עם כלום
-    if (!cleanName) {
-      alert('Please enter a valid file name');
-      return;
+    const cleanName = normalizeFileName(fileName)
+    if (!isValidFileName(cleanName)) {
+      alert('Please enter a valid file name')
+      return
     }
 
-    // 3. הגנה מדריסה של קובץ אחר:
-    // נזהיר רק אם השם קיים ברשימה, *וגם* זה לא השם של הקובץ הפתוח כרגע.
-    if (cleanName !== activeDoc?.fileName && fileList.includes(cleanName)) {
-      const wantsToOverwrite = window.confirm(`The file "${cleanName}" already exists. Do you want to overwrite it?`);
+    if (shouldConfirmOverwrite(cleanName, activeDoc?.fileName, fileExists(currentUser, cleanName))) {
+      const wantsToOverwrite = window.confirm(
+        `The file "${cleanName}" already exists. Do you want to overwrite it?`,
+      )
       if (!wantsToOverwrite) {
-        return; // המשתמש לחץ "ביטול" - עוצרים את השמירה
+        return
       }
     }
 
-    // --- מכאן הכל כמו הקוד שלך, רק משתמשים ב-cleanName במקום fileName ---
-    
-    localStorage.setItem(`editor_file_${cleanName}`, JSON.stringify(activeDoc?.textElements || []));
-
-    if (!fileList.includes(cleanName)) {
-      const newList = [...fileList, cleanName];
-      setFileList(newList);
-      const globalIndex = JSON.parse(localStorage.getItem('editor_files_index')) || [];
-      globalIndex.push({ name: cleanName, owner: currentUser }); // הנחתי ש-currentUser קיים אצלך בסקופ
-      localStorage.setItem('editor_files_index', JSON.stringify(globalIndex));
+    const result = persistDocumentForUser(activeDoc, cleanName)
+    if (!result.success) {
+      alert(result.error)
+      return
     }
 
     setDocuments((prevDocs) =>
-      prevDocs.map((doc) => (doc.id === activeDocumentId ? { ...doc, fileName: cleanName, isDirty: false } : doc)),
-    );
-    alert('File saved successfully!');
+      markDocumentSaved(prevDocs, activeDocumentId, result.fileName),
+    )
+    setFileList(getUserFileNames(currentUser))
+    alert('File saved successfully!')
   }
 
   function handleSave() {
     if (activeDoc?.fileName) {
-      handleSaveAs(activeDoc.fileName); // שולח את השם הקיים - זה יעבור את בדיקת הדריסה בשקט בזכות הטריק שלנו
-      return;
+      handleSaveAs(activeDoc.fileName)
+      return
     }
-    alert("Please use 'Save As' to name your file first.");
+
+    alert("Please use 'Save As' to name your file first.")
   }
 
+  // File Opening and Document Closing Workflow
   function handleOpen(fileName) {
-    if (!fileName) return;
+    if (!fileName) return
 
-    // בונוס UX: אם הקובץ כבר פתוח באחד הטאבים, פשוט נעבור אליו בלי לשכפל!
-    const alreadyOpenDoc = documents.find(doc => doc.fileName === fileName);
+    const alreadyOpenDoc = findDocumentByFileName(documents, fileName)
     if (alreadyOpenDoc) {
-      setActiveDocumentId(alreadyOpenDoc.id);
-      return;
+      setActiveDocumentId(alreadyOpenDoc.id)
+      return
     }
 
-    const data = localStorage.getItem(`editor_file_${fileName}`);
-    if (!data) return;
+    const result = openDocumentFromStorage(fileName)
+    if (!result.success) return
 
-    const parsedData = JSON.parse(data);
-
-    // בדיקה: האם המסמך הפעיל כרגע ריק לגמרי וחסר שם?
-    const isEmptyAndUnnamed = !activeDoc.fileName && activeDoc.textElements.length === 0;
-
-    if (isEmptyAndUnnamed) {
-      // המסמך ריק ואין לו שם - נדרוס אותו ונציג בו את הקובץ שנפתח
-      setDocuments((prevDocs) =>
-        prevDocs.map((doc) =>
-          doc.id === activeDocumentId
-            ? { ...doc, textElements: parsedData, textHistory: [], fileName, isDirty: false }
-            : doc
-        )
-      );
-    } else {
-      // יש לנו עבודה על המסך (או שיש לה שם, או שיש בה טקסט).
-      // במקום לדרוס, נוסיף מסמך חדש ונפתח אותו לצידו!
-      const newDoc = {
-        id: crypto.randomUUID(),
-        textElements: parsedData,
-        textHistory: [],
-        fileName,
-        isDirty: false,
-      };
-      
-      setDocuments((prevDocs) => [...prevDocs, newDoc]);
-      setActiveDocumentId(newDoc.id); // מעביר את הפוקוס לקובץ החדש שפתחנו
-    }
+    const workspaceState = loadDocumentIntoWorkspace(
+      documents,
+      activeDocumentId,
+      result,
+    )
+    setDocuments(workspaceState.documents)
+    setActiveDocumentId(workspaceState.activeDocumentId)
   }
 
   function handleCloseDocument(id) {
-    const docToClose = documents.find((doc) => doc.id === id)
-    if (!docToClose) return;
+    const docToClose = findDocumentById(documents, id)
+    if (!docToClose) return
 
-    // התיקון: מקפיצים את שאלת השמירה *רק* אם הקובץ שונה
     if (docToClose.isDirty) {
       const wantsToSave = window.confirm('Do you want to save this document before closing?')
 
@@ -265,47 +240,41 @@ function App() {
           fName = window.prompt('Enter file name to save:')
         }
 
-        // תיקון באג 2: סוגרים רק אם באמת נתנו שם וזה נשמר
         if (fName) {
-          localStorage.setItem(`editor_file_${fName}`, JSON.stringify(docToClose.textElements))
-          if (!fileList.includes(fName)) {
-            const newList = [...fileList, fName]
-            setFileList(newList)
-            const globalIndex = JSON.parse(localStorage.getItem('editor_files_index')) || []
-            globalIndex.push({ name: fName, owner: currentUser })
-            localStorage.setItem('editor_files_index', JSON.stringify(globalIndex))
+          const saveResult = persistDocumentForUser(docToClose, fName)
+          if (!saveResult.success) {
+            alert(saveResult.error)
+            return
           }
+
+          setFileList(getUserFileNames(currentUser))
         } else {
-          return; // אם המשתמש ביטל את בקשת השם, נעצור ולא נסגור
+          return
         }
       } else {
-        const confirmClose = window.confirm('Are you sure you want to close without saving? Unsaved changes will be lost.')
-        if (!confirmClose) return;
+        const confirmClose = window.confirm(
+          'Are you sure you want to close without saving? Unsaved changes will be lost.',
+        )
+        if (!confirmClose) return
       }
     }
 
-    // --- תהליך סגירת הקובץ המקורי שלך (ללא האנימציות) ---
-    let remainingDocs = documents.filter((doc) => doc.id !== id)
-
-    // אם סגרנו את הקובץ האחרון, פותחים מסמך חדש כדי לא להשאיר מסך ריק
-    if (remainingDocs.length === 0) {
-      remainingDocs = [createDocument()]
-    }
-
-    setDocuments(remainingDocs)
-
-    if (activeDocumentId === id) {
-      setActiveDocumentId(remainingDocs[0].id)
-    }
+    const workspaceState = removeDocumentFromWorkspace(
+      documents,
+      activeDocumentId,
+      id,
+    )
+    setDocuments(workspaceState.documents)
+    setActiveDocumentId(workspaceState.activeDocumentId)
   }
-  // חומת ההגנה של מסך ההתחברות (רינדור מותנה)
+
   if (!currentUser) {
-    return <Auth onLogin={handleLogin} />
+    return <Auth onAuthenticated={handleAuthenticated} />
   }
 
   return (
     <div className="app-shell">
-      <FileMenu
+      <TopBar
         fileList={fileList}
         currentFileName={activeDoc?.fileName || ''}
         currentUser={currentUser}
@@ -316,33 +285,26 @@ function App() {
         onNew={handleNewDocument}
       />
 
-      <main className="app-workspace">
-        <div className="app-documents">
-          {documents.map((doc) => (
-            <DisplayArea
-              key={doc.id}
-              textElements={doc.textElements}
-              searchQuery={searchQuery}
-              isActive={doc.id === activeDocumentId}
-              onClick={() => setActiveDocumentId(doc.id)}
-              onClose={() => handleCloseDocument(doc.id)}
-            />
-          ))}
-        </div>
-      </main>
+      <Workspace
+        documents={documents}
+        activeDocumentId={activeDocumentId}
+        searchQuery={searchQuery}
+        onDocumentSelect={setActiveDocumentId}
+        onDocumentClose={handleCloseDocument}
+      />
 
-      <footer className="app-control-dashboard">
-        <div className="floating-box box-left">
-          <StylePanel currentStyle={currentStyle} onStyleChange={handleStyleChange} applyMode={applyMode} onModeChange={setApplyMode} />
-          <DeletePanel onDeleteChar={handleDeleteChar} onDeleteWord={handleDeleteWord} onClearAll={handleClearAll} />
-        </div>
-        <div className="floating-box box-center">
-          <KeyboardArea onAddCharacter={handleAddCharacter} />
-        </div>
-        <div className="floating-box box-right">
-          <AdvancedPanel searchQuery={searchQuery} onSearchChange={setSearchQuery} onReplace={handleReplace} onUndo={handleUndo} canUndo={activeDoc ? activeDoc.textHistory.length > 0 : false} />
-        </div>
-      </footer>
+      <Dashboard
+        onApplyStyleToAll={handleApplyStyleToAll}
+        onDeleteChar={handleDeleteChar}
+        onDeleteWord={handleDeleteWord}
+        onClearAll={handleClearAll}
+        onAddCharacter={handleAddCharacter}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        onReplace={handleReplace}
+        onUndo={handleUndo}
+        canUndo={activeDoc ? activeDoc.textHistory.length > 0 : false}
+      />
     </div>
   )
 }

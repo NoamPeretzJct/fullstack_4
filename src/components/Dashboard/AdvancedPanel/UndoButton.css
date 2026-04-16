@@ -1,0 +1,66 @@
+.undo-button-box {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.undo-button-box__label {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  user-select: none;
+}
+
+.undo-button-box__button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 85px;
+  height: 26px;
+  padding: 0 10px;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: #7a9fd4;
+  direction: ltr;
+  white-space: nowrap;
+  background: var(--color-bg);
+  border: 1px solid rgba(100, 130, 200, 0.35);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.undo-button-box__button:hover {
+  background: rgba(100, 130, 200, 0.1);
+  border-color: rgba(100, 130, 200, 0.6);
+  color: #a8c4e8;
+  box-shadow: 0 0 10px rgba(100, 130, 200, 0.12);
+}
+
+.undo-button-box__button:active {
+  transform: translateY(1px);
+}
+
+.undo-button-box__button--disabled,
+.undo-button-box__button--disabled:hover {
+  opacity: 0.3;
+  cursor: not-allowed;
+  background: transparent;
+  border-color: var(--color-border);
+  color: var(--color-text-muted);
+  box-shadow: none;
+  transform: none;
+}
+
+.undo-button-box__icon {
+  font-size: 0.85rem;
+  line-height: 1;
+}
