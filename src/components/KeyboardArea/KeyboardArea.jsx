@@ -1,36 +1,35 @@
 import { useState } from 'react'
 import './KeyboardArea.css'
 
-
 const keyboardLayouts = {
   hebrew: [
     ['/', "'", 'ק', 'ר', 'א', 'ט', 'ו', 'ן', 'ם', 'פ'],
     ['ש', 'ד', 'ג', 'כ', 'ע', 'י', 'ח', 'ל', 'ך', 'ף'],
-    ['ז', 'ס', 'ב', 'ה', 'נ', 'מ', 'צ', 'ת', 'ץ'],
-    [{ char: ' ', label: 'רווח', type: 'space' }] 
+    [{ char: '', label: '⇧', type: 'action' }, 'ז', 'ס', 'ב', 'ה', 'נ', 'מ', 'צ', 'ת', 'ץ', { char: '', label: '⇧', type: 'action' }],
+    [{ char: ' ', label: 'Space', type: 'space' }]
   ],
   english: [
     ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
-    ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
-    ['z', 'x', 'c', 'v', 'b', 'n', 'm'],
+    [{ char: '', label: 'Caps', type: 'action' }, 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', { char: '', label: 'Enter', type: 'action' }],
+    [{ char: '', label: 'Shift', type: 'action-wide' }, 'z', 'x', 'c', 'v', 'b', 'n', 'm', { char: '', label: 'Shift', type: 'action-wide' }],
     [{ char: ' ', label: 'Space', type: 'space' }]
   ],
   symbols: [
     ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
-    ['!', '@', '#', '$', '%', '^', '&', '*', '(', ')'],
-    ['-', '_', '=', '+', '[', ']', '{', '}', ';', ':'],
-    [',', '.', '<', '>', '?', { char: ' ', label: 'Space', type: 'space' }]
+    ['@', '#', '$', '%', '&', '*', '-', '+', '(', ')'],
+    [{ char: '', label: '★', type: 'action-wide' }, '!', '"', "'", ':', ';', '/', '?', { char: '', label: '★', type: 'action-wide' }],
+    [{ char: ' ', label: 'Space', type: 'space' }]
   ],
   emojis: [
-    ['😀', '😂', '😍', '😎', '🤔', '👍', '❤️', '🔥'],
-    ['✨', '🎉', '✅', '🥳', '😇', '🤩', '😜', '😡'],
-    ['😭', '🤯', '😴', '👀', '💪', '🚀', '⭐', '🎈'],
+    ['😀', '😂', '🥰', '😎', '🤔', '🙄', '😭', '😡', '🤯', '🥳'],
+    ['👍', '👎', '👏', '🙏', '💪', '🤝', '❤️', '💔', '✨', '🔥'],
+    [{ char: '', label: '☺', type: 'action-wide' }, '🎉', '💯', '✅', '❌', '🚀', '⭐', '🎈', { char: '', label: '☺', type: 'action-wide' }],
+    [{ char: ' ', label: 'Space', type: 'space' }]
   ]
 }
 
 export default function KeyboardArea({ onAddCharacter }) {
   const [language, setLanguage] = useState('hebrew')
-
   const currentLayout = keyboardLayouts[language]
 
   return (
@@ -43,13 +42,9 @@ export default function KeyboardArea({ onAddCharacter }) {
       </div>
 
       <div className="keyboard-board">
-        {/* עוברים בלולאה על השורות */}
         {currentLayout.map((row, rowIndex) => (
           <div key={rowIndex} className={`keyboard-row row-${rowIndex}`}>
-            
-            {/* בתוך כל שורה, עוברים על המקשים */}
             {row.map((keyItem, keyIndex) => {
-              // בודקים אם המקש הוא אובייקט (כמו הרווח) או סתם אות (מחרוזת)
               const isObj = typeof keyItem === 'object'
               const char = isObj ? keyItem.char : keyItem
               const label = isObj ? keyItem.label : keyItem
@@ -59,7 +54,11 @@ export default function KeyboardArea({ onAddCharacter }) {
                 <button
                   key={keyIndex}
                   className={`key-btn key-${keyType}`}
-                  onClick={() => onAddCharacter(char)}
+                  onClick={() => {
+                    if (char !== '') {
+                      onAddCharacter(char)
+                    }
+                  }}
                 >
                   {label}
                 </button>

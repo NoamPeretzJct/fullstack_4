@@ -102,3 +102,18 @@
   color: #64748b;
   letter-spacing: 1px;
 }
+
+/* העיצוב למקשים המיוחדים ששומרים על פרופורציות המקלדת */
+.key-action {
+  min-width: 48px;
+  font-size: 0.8rem;
+  background: #1e293b;
+  color: #64748b; /* צבע עמום יותר כדי להראות שהם לא מקלידים טקסט */
+}
+
+.key-action-wide {
+  min-width: 65px;
+  font-size: 0.8rem;
+  background: #1e293b;
+  color: #64748b;
+}

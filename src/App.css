@@ -6,8 +6,8 @@
 .app-shell {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  /* Dashboard is fixed, so shell just needs to hold the workspace */
+  height: 100vh; 
+  overflow: hidden; 
 }
 
 /* ── App Title ────────────────────────────────────────────── */
@@ -31,19 +31,12 @@
 
 /* ── Workspace (scrollable middle zone) ───────────────────── */
 .app-workspace {
-  flex: 1;
-  overflow-y: auto;
+  flex: 1; 
+  overflow-y: auto; 
   overflow-x: hidden;
-  padding: var(--space-xl) var(--space-xl) 0;
-
-  /* Top offset for the fixed FileMenu header */
+  padding: var(--space-xl) var(--space-xl) var(--space-xl);
   padding-top: calc(56px + var(--space-xl));
-
-  /* Bottom clearance so content doesn't hide under fixed dashboard */
-  padding-bottom: var(--space-xl);
-  /* Dashboard height is dynamic — we give generous clearance.
-     JS could compute this, but per our rules we keep it CSS-only. */
-  margin-bottom: var(--dashboard-clearance, 320px);
+ 
 }
 
 /* ── Documents grid inside workspace ─────────────────────── */
@@ -58,22 +51,17 @@
 
 /* ── Control Dashboard (fixed to bottom) ─────────────────── */
 .app-control-dashboard {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
+
+  flex-shrink: 0; 
   z-index: 100;
 
-  /* זה הקסם ששומר על ריווח זהה בשני הצדדים: */
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: flex-end;
-  gap: 20px; /* זה קובע את המרחק האחיד בין כל הקופסאות! */
+  gap: 20px;
 
   padding: 15px 20px 25px 20px;
-  
-  /* הרקע שלך נשאר כמו שהוא */
   background: linear-gradient(to bottom, transparent 0%, rgba(10, 14, 26, 0.6) 20%, rgba(10, 14, 26, 0.96) 55%);
 }
 
@@ -108,13 +96,13 @@
 
 .floating-box.box-left,
 .floating-box.box-right {
-  padding: 14px 18px; /* קצת יותר נושם */
-  flex: 0 0 300px; /* רוחב קבוע לשניהם */
-  height: 170px; /* <--- זה הקסם! נועל את הגובה של שניהם להיות בדיוק אותו דבר. תשחק עם המספר הזה כדי שיתאים בדיוק לתוכן של צד שמאל */
+  padding: 14px 18px; 
+  flex: 0 0 300px; 
+  height: 170px; 
   
   display: flex;
   flex-direction: column;
-  justify-content: center; /* ממורכז את התוכן פנימה בצורה מושלמת */
+  justify-content: center; 
   
   transform: scale(0.84);
   transform-origin: bottom center;
