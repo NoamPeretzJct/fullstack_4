@@ -31,7 +31,7 @@ function ReplaceBox({ onReplace }) {
           onChange={(e) => setFindChar(e.target.value)}
           placeholder="find"
         />
-        <span className="replace-box__arrow">׳’ג€ ג€™</span>
+        <span className="replace-box__arrow">-</span>
         <input
           className="replace-box__input"
           maxLength={1}

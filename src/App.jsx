@@ -61,13 +61,14 @@ function App() {
   const activeDoc = getActiveDocument(documents, activeDocumentId)
 
   // Session and App Initialization
-  
+
   function resetEditorState() {
     const nextWorkspaceState = createInitialWorkspaceState()
     setDocuments(nextWorkspaceState.documents)
     setActiveDocumentId(nextWorkspaceState.activeDocumentId)
   }
 
+  
   function handleAuthenticated(username) {
     setCurrentUser(username)
     setFileList(getUserFileNames(username))

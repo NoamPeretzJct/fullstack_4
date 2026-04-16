@@ -9,7 +9,7 @@ function UndoButton({ canUndo, onUndo }) {
         onClick={onUndo}
         disabled={!canUndo}
       >
-        <span className="undo-button-box__icon">׳’ג€ ֲ©</span>
+        <span className="undo-button-box__icon"></span>
         Undo
       </button>
     </div>

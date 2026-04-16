@@ -9,6 +9,7 @@ export function createDocument(overrides = {}) {
   }
 }
 
+// update the active document's text elements using the provided updater function, and optionally save the previous state to history
 export function updateActiveDocument(documents, activeDocumentId, updaterFn, saveHistory = true) {
   return documents.map((doc) => {
     if (doc.id !== activeDocumentId) {
@@ -46,6 +47,7 @@ export function undoActiveDocument(documents, activeDocumentId) {
   })
 }
 
+// mark the document as saved (not dirty) and optionally update the file name
 export function markDocumentSaved(documents, documentId, fileName) {
   return documents.map((doc) =>
     doc.id === documentId
